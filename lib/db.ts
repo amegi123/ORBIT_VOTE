@@ -3,13 +3,45 @@ import path from 'path';
 import fs from 'fs';
 import { Campaign, TikToker, Vote, OtpRecord } from './types';
 
-// Ensure data folder exists
-const DATA_DIR = path.join(process.cwd(), 'data');
-if (!fs.existsSync(DATA_DIR)) {
-  fs.mkdirSync(DATA_DIR, { recursive: true });
-}
+// Database path resolution with Vercel / serverless support
+function getDatabasePath(): string {
+  // Detect Vercel / AWS Lambda / serverless environment
+  const isServerless =
+    Boolean(process.env.VERCEL) ||
+    Boolean(process.env.AWS_LAMBDA_FUNCTION_NAME) ||
+    Boolean(process.env.NOW_REGION) ||
+    process.env.NODE_ENV === 'production';
 
-const DB_PATH = path.join(DATA_DIR, 'orbit_voting.db');
+  if (isServerless) {
+    const tmpDir = process.env.TMPDIR || '/tmp';
+    const tmpDbPath = path.join(tmpDir, 'orbit_voting.db');
+    const sourceDbPath = path.join(process.cwd(), 'data', 'orbit_voting.db');
+
+    // On cold start, copy the pre-seeded sqlite db to /tmp if it exists
+    if (!fs.existsSync(tmpDbPath)) {
+      try {
+        if (fs.existsSync(sourceDbPath)) {
+          fs.copyFileSync(sourceDbPath, tmpDbPath);
+        }
+      } catch (err) {
+        console.warn('Could not copy bundled sqlite db to /tmp, initializing fresh in /tmp:', err);
+      }
+    }
+    return tmpDbPath;
+  }
+
+  // Local development
+  const localDataDir = path.join(process.cwd(), 'data');
+  try {
+    if (!fs.existsSync(localDataDir)) {
+      fs.mkdirSync(localDataDir, { recursive: true });
+    }
+    return path.join(localDataDir, 'orbit_voting.db');
+  } catch {
+    const tmpDir = process.env.TMPDIR || '/tmp';
+    return path.join(tmpDir, 'orbit_voting.db');
+  }
+}
 
 // Global singleton pattern for Next.js hot-reloading
 declare global {
@@ -18,18 +50,25 @@ declare global {
 
 function getDatabase(): DatabaseSync {
   if (!global.__orbitDb) {
-    global.__orbitDb = new DatabaseSync(DB_PATH);
+    const dbPath = getDatabasePath();
+    global.__orbitDb = new DatabaseSync(dbPath);
     initSchema(global.__orbitDb);
   }
   return global.__orbitDb;
 }
 
 function initSchema(db: DatabaseSync) {
-  // Enable WAL mode for high performance concurrency
-  db.exec(`
-    PRAGMA journal_mode = WAL;
-    PRAGMA synchronous = NORMAL;
+  try {
+    db.exec('PRAGMA journal_mode = WAL;');
+    db.exec('PRAGMA synchronous = NORMAL;');
+  } catch (e) {
+    // Fallback if filesystem does not permit WAL
+    try {
+      db.exec('PRAGMA journal_mode = MEMORY;');
+    } catch {}
+  }
 
+  db.exec(`
     CREATE TABLE IF NOT EXISTS campaigns (
       id TEXT PRIMARY KEY,
       title TEXT NOT NULL,
@@ -110,8 +149,8 @@ function seedInitialData(db: DatabaseSync) {
 
     insertCampaign.run(
       'orbit-tiktoker-2026',
-      'Orbit Electronics TikToker of the Year 2026',
-      'Celebrate Ethiopia\'s premier creators. Cast your verified vote once every 24 hours to elevate your favorite TikTok star to #1.',
+      'Orbit Creative Challenge 2026',
+      'Celebrate Ethiopia\'s premier creators. Cast your verified vote once every 24 hours in the Orbit Creative Challenge 2026.',
       startAt,
       endAt,
       'active',

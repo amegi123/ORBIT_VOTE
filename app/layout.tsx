@@ -3,12 +3,12 @@ import "./globals.css";
 import { ToastProvider } from "@/components/ToastContext";
 
 export const metadata: Metadata = {
-  title: "Orbit Electronics — TikToker Voting 2026",
-  description: "Official Orbit Electronics TikToker of the Year 2026 Awards. Cast your verified vote once every 24 hours.",
-  keywords: ["Orbit Electronics", "TikToker Voting", "Ethiopian Creators", "TikTok Awards", "Blue"],
+  title: "Orbit Creative Challenge 2026 | Official Voting Platform",
+  description: "Official Orbit Electronics Creative Challenge 2026. Cast your verified vote once every 24 hours.",
+  keywords: ["Orbit Electronics", "Orbit Creative Challenge", "Ethiopian Creators", "Creative Challenge Vote", "Orbit Voting"],
   openGraph: {
-    title: "Orbit Electronics — TikToker of the Year 2026",
-    description: "Help your favorite TikTok creator reach #1. Verified 24-hour voting platform.",
+    title: "Orbit Creative Challenge 2026",
+    description: "Help your favorite creator win the Orbit Creative Challenge 2026. Verified 24-hour voting platform.",
     type: "website",
   },
 };

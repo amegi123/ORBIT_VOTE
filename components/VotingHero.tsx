@@ -22,15 +22,15 @@ export function VotingHero({ totalVotes, onVoteNowClick, onOpenStatusCheck }: Vo
             <span className="relative inline-flex rounded-full h-2 w-2 bg-blue-600" />
           </span>
           <span className="text-xs font-black tracking-wider uppercase text-blue-700">
-            ORBIT ELECTRONICS • TIKTOKER OF THE YEAR 2026
+            ORBIT ELECTRONICS • CREATIVE CHALLENGE 2026
           </span>
         </div>
 
         {/* Title */}
         <h1 className="text-3xl sm:text-5xl font-black text-slate-900 tracking-tight leading-tight mb-2">
-          Vote for Your{' '}
+          Orbit{' '}
           <span className="bg-gradient-to-r from-blue-600 via-indigo-600 to-blue-500 bg-clip-text text-transparent">
-            Favorite TikToker
+            Creative Challenge Vote
           </span>
         </h1>
 
@@ -62,11 +62,11 @@ export function VotingHero({ totalVotes, onVoteNowClick, onOpenStatusCheck }: Vo
           {/* Left Text & CTA inside Banner */}
           <div className="md:col-span-7 flex flex-col items-center md:items-start text-center md:text-left">
             <div className="inline-flex items-center px-3 py-1 rounded-lg bg-white/20 backdrop-blur-md text-xs font-bold text-blue-100 mb-3">
-              <span>Official 2026 Competition</span>
+              <span>Official 2026 Creative Challenge</span>
             </div>
 
             <h2 className="text-2xl sm:text-3xl font-black text-white leading-tight mb-2">
-              Crown Ethiopia's Next TikTok Icon
+              Crown Ethiopia's Next Creative Icon
             </h2>
 
             <p className="text-xs sm:text-sm text-blue-100/90 max-w-md mb-6 leading-relaxed">

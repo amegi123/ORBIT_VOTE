@@ -20,7 +20,7 @@ export function Footer({ onOpenRules, onOpenStatusCheck }: FooterProps) {
             className="h-5 sm:h-6 w-auto max-w-[130px] object-contain"
           />
           <p className="text-[10px] sm:text-[11px] text-slate-500">
-            TikToker Voting Campaign 2026. Addis Ababa, Ethiopia.
+            Orbit Creative Challenge 2026. Addis Ababa, Ethiopia.
           </p>
         </div>
 

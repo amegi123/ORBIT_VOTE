@@ -40,7 +40,7 @@ export function RulesModal({ isOpen, onClose }: RulesModalProps) {
           </div>
           <div>
             <h3 className="text-xl font-bold text-slate-900 leading-tight">Official Voting Rules</h3>
-            <p className="text-xs text-slate-500">Orbit Electronics TikToker Awards 2026</p>
+            <p className="text-xs text-slate-500">Orbit Electronics Creative Challenge 2026</p>
           </div>
         </div>
 
