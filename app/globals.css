@@ -1,0 +1,110 @@
+@import "tailwindcss";
+
+@layer base {
+  :root {
+    --bg-main: #f8fafc;
+    --bg-card: #ffffff;
+    --border-card: #e2e8f0;
+    --brand-blue: #2563eb;
+    --brand-blue-dark: #1d4ed8;
+    --brand-blue-light: #eff6ff;
+    --gold: #f59e0b;
+    --gold-glow: rgba(245, 158, 11, 0.25);
+  }
+
+  *, ::before, ::after {
+    box-sizing: border-box;
+  }
+
+  html, body {
+    max-width: 100vw;
+    overflow-x: hidden;
+  }
+
+  body {
+    background-color: #f8fafc;
+    color: #0f172a;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    min-height: 100vh;
+  }
+}
+
+/* Light Theme Glassmorphic & Card Utilities */
+.light-card {
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  box-shadow: 0 4px 20px -4px rgba(15, 23, 42, 0.05);
+}
+
+.light-card-hover {
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.light-card-hover:hover {
+  border-color: #93c5fd;
+  transform: translateY(-4px);
+  box-shadow: 0 16px 32px -8px rgba(37, 99, 235, 0.12), 0 4px 12px -2px rgba(15, 23, 42, 0.04);
+}
+
+/* Top 3 Ranks Light Luxury Borders */
+.rank-1-border {
+  border: 2px solid #f59e0b;
+  box-shadow: 0 10px 25px -4px rgba(245, 158, 11, 0.2), 0 2px 8px -2px rgba(245, 158, 11, 0.1);
+  background: linear-gradient(180deg, rgba(254, 243, 199, 0.3) 0%, #ffffff 100%);
+}
+
+.rank-2-border {
+  border: 2px solid #94a3b8;
+  box-shadow: 0 8px 20px -4px rgba(148, 163, 184, 0.25);
+  background: linear-gradient(180deg, rgba(241, 245, 249, 0.4) 0%, #ffffff 100%);
+}
+
+.rank-3-border {
+  border: 2px solid #d97706;
+  box-shadow: 0 8px 20px -4px rgba(217, 119, 6, 0.2);
+  background: linear-gradient(180deg, rgba(254, 243, 199, 0.2) 0%, #ffffff 100%);
+}
+
+/* Floating animation */
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-6px);
+  }
+}
+
+.animate-float {
+  animation: float 4s ease-in-out infinite;
+}
+
+@keyframes pulse-slow {
+  0%, 100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.9;
+    transform: scale(1.02);
+  }
+}
+
+.animate-pulse-slow {
+  animation: pulse-slow 3s ease-in-out infinite;
+}
+
+/* Custom Scrollbar for Light Theme */
+::-webkit-scrollbar {
+  width: 8px;
+}
+::-webkit-scrollbar-track {
+  background: #f1f5f9;
+}
+::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
+}
