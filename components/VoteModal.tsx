@@ -38,18 +38,34 @@ export function VoteModal({ isOpen, tiktoker, onClose, onVoteSuccess }: VoteModa
     nextEligibleVoteAt: string;
   } | null>(null);
 
+  // Reset ALL state whenever modal opens or creator changes
   useEffect(() => {
     if (isOpen) {
       setStep('phone');
-      setErrorMessage(null);
+      setPhoneNumber('');
+      setNormalizedPhone('');
       setDemoOtp(undefined);
+      setErrorMessage(null);
+      setIsLoading(false);
+      setSuccessPayload(null);
     }
   }, [isOpen, tiktoker?.id]);
+
+  const handleClose = () => {
+    setStep('phone');
+    setPhoneNumber('');
+    setNormalizedPhone('');
+    setDemoOtp(undefined);
+    setErrorMessage(null);
+    setIsLoading(false);
+    setSuccessPayload(null);
+    onClose();
+  };
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === 'Escape' && isOpen) {
-        onClose();
+        handleClose();
       }
     };
     window.addEventListener('keydown', handleKeyDown);
@@ -162,7 +178,7 @@ export function VoteModal({ isOpen, tiktoker, onClose, onVoteSuccess }: VoteModa
       className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-0 sm:p-4 bg-slate-900/60 backdrop-blur-sm animate-in fade-in duration-200"
       onClick={(e) => {
         if (e.target === e.currentTarget && step !== 'otp') {
-          onClose();
+          handleClose();
         }
       }}
     >
@@ -177,7 +193,7 @@ export function VoteModal({ isOpen, tiktoker, onClose, onVoteSuccess }: VoteModa
         {/* Close Button */}
         <button
           type="button"
-          onClick={onClose}
+          onClick={handleClose}
           className="absolute top-4 right-4 sm:top-5 sm:right-5 p-1.5 sm:p-2 rounded-xl bg-slate-100 text-slate-500 hover:text-slate-900 hover:bg-slate-200 transition-colors z-10 cursor-pointer"
           aria-label="Close modal"
         >
@@ -214,7 +230,7 @@ export function VoteModal({ isOpen, tiktoker, onClose, onVoteSuccess }: VoteModa
             ranking={successPayload.ranking}
             newTotalVotes={successPayload.newTotalVotes}
             nextEligibleVoteAt={successPayload.nextEligibleVoteAt}
-            onClose={onClose}
+            onClose={handleClose}
           />
         )}
       </div>

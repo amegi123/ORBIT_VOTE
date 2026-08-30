@@ -357,34 +357,14 @@ export function resetDemoVoting(phoneNumber?: string, ipAddress?: string): { suc
   let count = 0;
 
   try {
-    if (phoneNumber || (ipAddress && !['127.0.0.1', '::1', 'unknown', 'localhost'].includes(ipAddress))) {
-      // Find matching votes to remove
-      const votesToDelete = db.prepare(`
-        SELECT id, tiktoker_id FROM votes 
-        WHERE phone_number = ? OR (ip_address = ? AND ip_address NOT IN ('127.0.0.1', '::1', 'unknown', 'localhost'))
-      `).all(phoneNumber || '', ipAddress || '') as { id: string; tiktoker_id: string }[];
-
-      for (const v of votesToDelete) {
-        db.prepare('DELETE FROM votes WHERE id = ?').run(v.id);
-        db.prepare('UPDATE tiktokers SET vote_count = MAX(0, vote_count - 1) WHERE id = ?').run(v.tiktoker_id);
-        count++;
-      }
-
-      if (phoneNumber) {
-        db.prepare('DELETE FROM otps WHERE phone_number = ?').run(phoneNumber);
-        db.prepare('DELETE FROM rate_limits WHERE identifier = ?').run(phoneNumber);
-      }
-    } else {
-      // Clear recent demo votes and reset rate limits
-      const allVotes = db.prepare('SELECT id, tiktoker_id FROM votes ORDER BY created_at DESC LIMIT 20').all() as { id: string; tiktoker_id: string }[];
-      for (const v of allVotes) {
-        db.prepare('DELETE FROM votes WHERE id = ?').run(v.id);
-        db.prepare('UPDATE tiktokers SET vote_count = MAX(0, vote_count - 1) WHERE id = ?').run(v.tiktoker_id);
-        count++;
-      }
-      db.prepare('DELETE FROM otps').run();
-      db.prepare('DELETE FROM rate_limits').run();
+    const allVotes = db.prepare('SELECT id, tiktoker_id FROM votes').all() as { id: string; tiktoker_id: string }[];
+    for (const v of allVotes) {
+      db.prepare('DELETE FROM votes WHERE id = ?').run(v.id);
+      db.prepare('UPDATE tiktokers SET vote_count = MAX(0, vote_count - 1) WHERE id = ?').run(v.tiktoker_id);
+      count++;
     }
+    db.prepare('DELETE FROM otps').run();
+    db.prepare('DELETE FROM rate_limits').run();
   } catch (err) {
     console.error('Demo reset error:', err);
   }
