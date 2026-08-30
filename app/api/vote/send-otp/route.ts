@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { validateEthiopianPhone } from '@/lib/phone';
-import { getLatestVoteForPhone, saveOtp, checkRateLimit, getActiveCampaign } from '@/lib/db';
+import { getLatestVoteForPhoneOrIp, saveOtp, checkRateLimit, getActiveCampaign } from '@/lib/db';
 import { calculateVotingCooldown, generateSecureOtp, OTP_VALIDITY_SECONDS } from '@/lib/security';
 import { SendOtpResponse } from '@/lib/types';
 
@@ -37,15 +37,17 @@ export async function POST(req: NextRequest) {
     }
 
     const normalizedPhone = phoneValidation.normalized;
+    const forwardedFor = req.headers.get('x-forwarded-for');
+    const clientIp = forwardedFor ? forwardedFor.split(',')[0].trim() : '127.0.0.1';
 
-    // 3. Strict 24-Hour Cooldown Verification Before Sending OTP
-    const latestVote = getLatestVoteForPhone(normalizedPhone);
+    // 3. Strict 24-Hour Cooldown Verification Before Sending OTP (Phone & IP)
+    const latestVote = getLatestVoteForPhoneOrIp(normalizedPhone, clientIp);
     const cooldownCheck = calculateVotingCooldown(latestVote ? latestVote.created_at : null);
 
     if (!cooldownCheck.canVote) {
       return NextResponse.json<SendOtpResponse>({
         success: false,
-        message: 'You have already voted within the last 24 hours. Please wait until your personal cooldown ends.',
+        message: 'Already voted within the last 24 hours (enforced per phone number and network IP).',
         normalized_phone: normalizedPhone,
         cooldown_remaining_seconds: cooldownCheck.cooldownRemainingSeconds,
         next_eligible_vote_at: cooldownCheck.nextEligibleVoteAt || undefined,

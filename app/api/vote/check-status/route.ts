@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { validateEthiopianPhone } from '@/lib/phone';
-import { getLatestVoteForPhone, getTikTokerById } from '@/lib/db';
+import { getLatestVoteForPhoneOrIp, getTikTokerById } from '@/lib/db';
 import { calculateVotingCooldown } from '@/lib/security';
 import { PhoneStatusResponse } from '@/lib/types';
 
@@ -21,7 +21,10 @@ export async function GET(req: NextRequest) {
     }
 
     const normalized = phoneValidation.normalized;
-    const latestVote = getLatestVoteForPhone(normalized);
+    const forwardedFor = req.headers.get('x-forwarded-for');
+    const clientIp = forwardedFor ? forwardedFor.split(',')[0].trim() : '127.0.0.1';
+
+    const latestVote = getLatestVoteForPhoneOrIp(normalized, clientIp);
 
     let lastVotedTiktokerName: string | null = null;
     if (latestVote) {

@@ -3,6 +3,7 @@
 // Orbit Ethiopian TikToker Voting Platform
 import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import { Campaign, TikToker, PhoneStatusResponse } from '@/lib/types';
+import { useToast } from '@/components/ToastContext';
 import { Navbar } from '@/components/Navbar';
 import { PersonalVoteCountdown } from '@/components/PersonalVoteCountdown';
 import { SearchBar } from '@/components/SearchBar';
@@ -13,6 +14,7 @@ import { RulesModal } from '@/components/RulesModal';
 import { Footer } from '@/components/Footer';
 
 export default function Home() {
+  const { showToast } = useToast();
   const [campaign, setCampaign] = useState<Campaign | null>(null);
   const [tiktokers, setTiktokers] = useState<TikToker[]>([]);
   const [totalVotes, setTotalVotes] = useState<number>(0);
@@ -150,6 +152,30 @@ export default function Home() {
   const handleClearSession = () => {
     localStorage.removeItem('orbit_voting_phone');
     setActivePhoneSession(null);
+    setCooldownSecondsRemaining(0);
+  };
+
+  const handleDemoReset = async () => {
+    try {
+      await fetch('/api/demo/reset', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          phone_number: activePhoneSession?.phoneNumber || undefined,
+        }),
+      });
+    } catch {}
+
+    localStorage.removeItem('orbit_voting_phone');
+    setActivePhoneSession(null);
+    setCooldownSecondsRemaining(0);
+    fetchLiveVotes(false);
+
+    showToast({
+      type: 'info',
+      title: 'Demo Reset Activated',
+      message: 'This feature is only for demo',
+    });
   };
 
   const isCampaignClosed = campaign ? new Date(campaign.end_at).getTime() <= Date.now() : false;
@@ -160,6 +186,7 @@ export default function Home() {
       <Navbar
         onOpenRules={() => setIsRulesModalOpen(true)}
         onOpenStatusCheck={() => setIsStatusCheckModalOpen(true)}
+        onDemoReset={handleDemoReset}
       />
 
       {/* 2. Personal 24-Hour Cooldown Banner (if active) */}
@@ -169,7 +196,7 @@ export default function Home() {
           nextEligibleAt={activePhoneSession.nextEligibleAt}
           initialCooldownSeconds={activePhoneSession.cooldownSeconds}
           lastVotedCreatorName={activePhoneSession.lastVotedCreatorName}
-          onClearSession={handleClearSession}
+          onClearSession={handleDemoReset}
         />
       )}
 

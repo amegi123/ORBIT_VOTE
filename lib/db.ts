@@ -309,14 +309,87 @@ export function getTikTokerById(id: string): TikToker | null {
 }
 
 export function getLatestVoteForPhone(phoneNumber: string): Vote | null {
+  return getLatestVoteForPhoneOrIp(phoneNumber);
+}
+
+export function getLatestVoteForPhoneOrIp(phoneNumber?: string, ipAddress?: string): Vote | null {
   const db = getDatabase();
-  const row = db.prepare(`
-    SELECT * FROM votes 
-    WHERE phone_number = ? 
-    ORDER BY created_at DESC 
-    LIMIT 1
-  `).get(phoneNumber) as Vote | undefined;
-  return row || null;
+  
+  // 1. If valid external IP provided, check phone OR IP
+  const isValidIp = ipAddress && !['127.0.0.1', '::1', 'unknown', 'localhost'].includes(ipAddress);
+  if (phoneNumber && isValidIp) {
+    const row = db.prepare(`
+      SELECT * FROM votes 
+      WHERE phone_number = ? OR ip_address = ? 
+      ORDER BY created_at DESC 
+      LIMIT 1
+    `).get(phoneNumber, ipAddress) as Vote | undefined;
+    if (row) return row;
+  }
+
+  // 2. Query by phone
+  if (phoneNumber) {
+    const row = db.prepare(`
+      SELECT * FROM votes 
+      WHERE phone_number = ? 
+      ORDER BY created_at DESC 
+      LIMIT 1
+    `).get(phoneNumber) as Vote | undefined;
+    if (row) return row;
+  }
+
+  // 3. Query by IP alone
+  if (isValidIp) {
+    const row = db.prepare(`
+      SELECT * FROM votes 
+      WHERE ip_address = ? 
+      ORDER BY created_at DESC 
+      LIMIT 1
+    `).get(ipAddress) as Vote | undefined;
+    if (row) return row;
+  }
+
+  return null;
+}
+
+export function resetDemoVoting(phoneNumber?: string, ipAddress?: string): { success: boolean; clearedVotesCount: number } {
+  const db = getDatabase();
+  let count = 0;
+
+  try {
+    if (phoneNumber || (ipAddress && !['127.0.0.1', '::1', 'unknown', 'localhost'].includes(ipAddress))) {
+      // Find matching votes to remove
+      const votesToDelete = db.prepare(`
+        SELECT id, tiktoker_id FROM votes 
+        WHERE phone_number = ? OR (ip_address = ? AND ip_address NOT IN ('127.0.0.1', '::1', 'unknown', 'localhost'))
+      `).all(phoneNumber || '', ipAddress || '') as { id: string; tiktoker_id: string }[];
+
+      for (const v of votesToDelete) {
+        db.prepare('DELETE FROM votes WHERE id = ?').run(v.id);
+        db.prepare('UPDATE tiktokers SET vote_count = MAX(0, vote_count - 1) WHERE id = ?').run(v.tiktoker_id);
+        count++;
+      }
+
+      if (phoneNumber) {
+        db.prepare('DELETE FROM otps WHERE phone_number = ?').run(phoneNumber);
+        db.prepare('DELETE FROM rate_limits WHERE identifier = ?').run(phoneNumber);
+      }
+    } else {
+      // Clear recent demo votes and reset rate limits
+      const allVotes = db.prepare('SELECT id, tiktoker_id FROM votes ORDER BY created_at DESC LIMIT 20').all() as { id: string; tiktoker_id: string }[];
+      for (const v of allVotes) {
+        db.prepare('DELETE FROM votes WHERE id = ?').run(v.id);
+        db.prepare('UPDATE tiktokers SET vote_count = MAX(0, vote_count - 1) WHERE id = ?').run(v.tiktoker_id);
+        count++;
+      }
+      db.prepare('DELETE FROM otps').run();
+      db.prepare('DELETE FROM rate_limits').run();
+    }
+  } catch (err) {
+    console.error('Demo reset error:', err);
+  }
+
+  return { success: true, clearedVotesCount: count };
 }
 
 export function saveOtp(phoneNumber: string, otpCode: string, expiresInSeconds: number): string {
@@ -382,7 +455,7 @@ export function checkRateLimit(identifier: string, action: string, maxCount: num
  * Executes an atomic vote transaction:
  * 1. Validates campaign status & end time
  * 2. Validates OTP and increments attempt count
- * 3. Enforces strict 24-hour phone cooldown
+ * 3. Enforces strict 24-hour phone and IP cooldown
  * 4. Inserts vote record
  * 5. Increments TikToker vote count
  * 6. Marks OTP as verified
@@ -442,8 +515,8 @@ export function executeVoteTransaction(params: {
     };
   }
 
-  // 4. Strict 24-Hour Cooldown Check on Backend
-  const latestVote = getLatestVoteForPhone(phoneNumber);
+  // 4. Strict 24-Hour Cooldown Check on Backend (by Phone OR IP)
+  const latestVote = getLatestVoteForPhoneOrIp(phoneNumber, ipAddress);
   if (latestVote) {
     const lastVoteTime = new Date(latestVote.created_at).getTime();
     const cooldownMs = 24 * 60 * 60 * 1000;
@@ -456,7 +529,7 @@ export function executeVoteTransaction(params: {
 
       return {
         success: false,
-        error: `This phone number has already voted in the last 24 hours. Next vote available at ${new Date(nextEligibleAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}.`,
+        error: `Already voted in the last 24 hours (enforced per phone and IP address). Next vote available at ${new Date(nextEligibleAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}.`,
         nextEligibleVoteAt: nextEligibleAt,
         cooldownSeconds: remainingSeconds,
       };
