@@ -3,6 +3,7 @@
 // Orbit Ethiopian TikToker Voting Platform
 import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import { Campaign, TikToker, PhoneStatusResponse } from '@/lib/types';
+import { Preloader } from '@/components/Preloader';
 import { Navbar } from '@/components/Navbar';
 import { PersonalVoteCountdown } from '@/components/PersonalVoteCountdown';
 import { SearchBar } from '@/components/SearchBar';
@@ -156,6 +157,9 @@ export default function Home() {
 
   return (
     <main className="min-h-screen w-full max-w-full overflow-x-hidden flex flex-col bg-slate-50 text-slate-900 selection:bg-blue-600 selection:text-white">
+      {/* 0. Branded Initial Preloader */}
+      <Preloader isLoading={isLoading} />
+
       {/* 1. Mobile-First Sticky Header */}
       <Navbar
         onOpenRules={() => setIsRulesModalOpen(true)}
