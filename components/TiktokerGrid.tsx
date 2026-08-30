@@ -26,16 +26,69 @@ export function TiktokerGrid({
 }: TiktokerGridProps) {
   if (isLoading) {
     return (
-      <section className="max-w-4xl mx-auto px-4 py-4 space-y-3">
-        {/* Leader Skeleton */}
-        <div className="w-full h-56 rounded-3xl bg-white border border-slate-200 animate-pulse p-4" />
-        {/* List Skeleton */}
-        {[1, 2, 3, 4, 5].map((i) => (
-          <div
-            key={i}
-            className="w-full h-16 rounded-2xl bg-white border border-slate-200 animate-pulse"
-          />
-        ))}
+      <section className="w-full max-w-4xl mx-auto px-3 sm:px-4 py-2 space-y-3">
+        {/* 1. Leader Card Skeleton */}
+        <div className="w-full rounded-2xl sm:rounded-3xl p-3.5 sm:p-6 bg-white border border-slate-200/90 shadow-2xs animate-pulse">
+          {/* Header pill skeletons */}
+          <div className="flex items-center justify-between gap-2 mb-3">
+            <div className="h-6 w-24 rounded-full bg-slate-200" />
+            <div className="h-5 w-20 rounded-full bg-slate-200" />
+          </div>
+
+          <div className="flex flex-col sm:flex-row gap-3.5 sm:gap-4 items-center">
+            {/* Portrait skeleton */}
+            <div className="w-full sm:w-44 aspect-[16/10] sm:aspect-square rounded-2xl bg-slate-200 shrink-0" />
+
+            {/* Info & action skeleton */}
+            <div className="flex-1 w-full flex flex-col justify-between">
+              <div>
+                <div className="h-3.5 w-24 rounded bg-slate-200 mb-2" />
+                <div className="h-6 w-48 sm:w-56 rounded-lg bg-slate-200 mb-2.5" />
+                <div className="h-3.5 w-full rounded bg-slate-200 mb-1.5" />
+                <div className="h-3.5 w-3/4 rounded bg-slate-200 mb-4" />
+              </div>
+
+              <div className="pt-2.5 border-t border-slate-100 flex items-center justify-between gap-2">
+                <div className="h-9 w-28 rounded-xl bg-slate-200 shrink-0" />
+                <div className="h-10 w-36 rounded-xl bg-slate-200" />
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* 2. Nominees List Header Skeleton */}
+        <div className="flex items-center justify-between px-1 pt-2">
+          <div className="h-4 w-32 rounded bg-slate-200 animate-pulse" />
+          <div className="h-4 w-16 rounded bg-slate-200 animate-pulse" />
+        </div>
+
+        {/* 3. Nominee Item Skeletons */}
+        <div className="flex flex-col gap-2">
+          {[1, 2, 3, 4, 5, 6].map((i) => (
+            <div
+              key={i}
+              className="w-full rounded-2xl p-2.5 sm:p-3.5 bg-white border border-slate-200/90 shadow-2xs animate-pulse flex items-center justify-between gap-2.5"
+            >
+              <div className="flex items-center gap-2 sm:gap-3 min-w-0 flex-1">
+                {/* Rank number placeholder */}
+                <div className="w-6 h-6 sm:w-7 sm:h-7 rounded-xl bg-slate-200 shrink-0" />
+                {/* Avatar placeholder */}
+                <div className="w-11 h-11 sm:w-13 sm:h-13 rounded-xl bg-slate-200 shrink-0" />
+                {/* Name & handle */}
+                <div className="min-w-0 flex-1">
+                  <div className="h-4 w-28 sm:w-40 rounded bg-slate-200 mb-1.5" />
+                  <div className="h-3 w-16 sm:w-24 rounded bg-slate-200" />
+                </div>
+              </div>
+
+              {/* Vote count & button placeholders */}
+              <div className="flex items-center gap-2 shrink-0">
+                <div className="h-8 w-16 sm:w-20 rounded-xl bg-slate-200 hidden xs:block" />
+                <div className="h-8 sm:h-9 w-20 sm:w-24 rounded-xl bg-slate-200" />
+              </div>
+            </div>
+          ))}
+        </div>
       </section>
     );
   }
