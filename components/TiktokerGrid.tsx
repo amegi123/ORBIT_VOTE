@@ -4,10 +4,11 @@ import React from 'react';
 import { TikToker } from '@/lib/types';
 import { LeaderCard } from './LeaderCard';
 import { TiktokerListItem } from './TiktokerListItem';
-import { SearchX, ListOrdered } from 'lucide-react';
+import { SearchX } from 'lucide-react';
 
 interface TiktokerGridProps {
   tiktokers: TikToker[];
+  searchQuery?: string;
   isLoading: boolean;
   totalVotesAllCreators: number;
   userCooldownRemainingSeconds?: number;
@@ -18,73 +19,54 @@ interface TiktokerGridProps {
 
 export function TiktokerGrid({
   tiktokers,
+  searchQuery = '',
   isLoading,
   userCooldownRemainingSeconds = 0,
   isCampaignClosed = false,
   onVoteClick,
   onResetSearch,
 }: TiktokerGridProps) {
+  const isSearchActive = searchQuery.trim().length > 0;
+
+  // 1. Loading State
   if (isLoading) {
     return (
-      <section className="w-full max-w-4xl mx-auto px-3 sm:px-4 py-2 space-y-3">
-        {/* 1. Leader Card Skeleton */}
-        <div className="w-full rounded-2xl sm:rounded-3xl p-3.5 sm:p-6 bg-white border border-slate-200/90 shadow-2xs animate-pulse">
-          {/* Header pill skeletons */}
-          <div className="flex items-center justify-between gap-2 mb-3">
-            <div className="h-6 w-24 rounded-full bg-slate-200" />
-            <div className="h-5 w-20 rounded-full bg-slate-200" />
+      <section className="w-full max-w-4xl mx-auto px-4 sm:px-6 py-4 space-y-5" aria-label="Loading nominees">
+        {/* Leader Card Skeleton */}
+        <div className="w-full rounded-2xl p-4 sm:p-6 bg-white border border-slate-200/90 animate-pulse">
+          <div className="flex items-center justify-between pb-3 mb-3 border-b border-slate-100">
+            <div className="h-4 w-24 rounded bg-slate-200" />
+            <div className="h-4 w-28 rounded bg-slate-200" />
           </div>
 
-          <div className="flex flex-col sm:flex-row gap-3.5 sm:gap-4 items-center">
-            {/* Portrait skeleton */}
-            <div className="w-full sm:w-44 aspect-[16/10] sm:aspect-square rounded-2xl bg-slate-200 shrink-0" />
+          <div className="h-[290px] sm:h-[320px] rounded-xl bg-slate-200 mb-4" />
 
-            {/* Info & action skeleton */}
-            <div className="flex-1 w-full flex flex-col justify-between">
-              <div>
-                <div className="h-3.5 w-24 rounded bg-slate-200 mb-2" />
-                <div className="h-6 w-48 sm:w-56 rounded-lg bg-slate-200 mb-2.5" />
-                <div className="h-3.5 w-full rounded bg-slate-200 mb-1.5" />
-                <div className="h-3.5 w-3/4 rounded bg-slate-200 mb-4" />
-              </div>
+          <div className="h-3 w-28 rounded bg-slate-200 mb-2" />
+          <div className="h-7 w-48 sm:w-60 rounded bg-slate-200 mb-2" />
+          <div className="h-3.5 w-3/4 rounded bg-slate-200 mb-4" />
 
-              <div className="pt-2.5 border-t border-slate-100 flex items-center justify-between gap-2">
-                <div className="h-9 w-28 rounded-xl bg-slate-200 shrink-0" />
-                <div className="h-10 w-36 rounded-xl bg-slate-200" />
-              </div>
-            </div>
+          <div className="pt-3 border-t border-slate-100 flex items-center justify-between gap-3">
+            <div className="h-9 w-24 rounded bg-slate-200" />
+            <div className="h-11 w-36 rounded-xl bg-slate-200" />
           </div>
         </div>
 
-        {/* 2. Nominees List Header Skeleton */}
-        <div className="flex items-center justify-between px-1 pt-2">
-          <div className="h-4 w-32 rounded bg-slate-200 animate-pulse" />
-          <div className="h-4 w-16 rounded bg-slate-200 animate-pulse" />
-        </div>
-
-        {/* 3. Nominee Item Skeletons */}
-        <div className="flex flex-col gap-2">
-          {[1, 2, 3, 4, 5, 6].map((i) => (
-            <div
-              key={i}
-              className="w-full rounded-2xl p-2.5 sm:p-3.5 bg-white border border-slate-200/90 shadow-2xs animate-pulse flex items-center justify-between gap-2.5"
-            >
-              <div className="flex items-center gap-2 sm:gap-3 min-w-0 flex-1">
-                {/* Rank number placeholder */}
-                <div className="w-6 h-6 sm:w-7 sm:h-7 rounded-xl bg-slate-200 shrink-0" />
-                {/* Avatar placeholder */}
-                <div className="w-11 h-11 sm:w-13 sm:h-13 rounded-xl bg-slate-200 shrink-0" />
-                {/* Name & handle */}
-                <div className="min-w-0 flex-1">
-                  <div className="h-4 w-28 sm:w-40 rounded bg-slate-200 mb-1.5" />
-                  <div className="h-3 w-16 sm:w-24 rounded bg-slate-200" />
+        {/* Nominees List Skeleton */}
+        <div className="bg-white border border-slate-200/90 rounded-2xl p-4 animate-pulse space-y-4">
+          <div className="h-4 w-28 rounded bg-slate-200 mb-2" />
+          {[1, 2, 3, 4, 5].map((i) => (
+            <div key={i} className="flex items-center justify-between py-3 border-b border-slate-100 last:border-0">
+              <div className="flex items-center gap-3">
+                <div className="w-5 h-4 rounded bg-slate-200" />
+                <div className="w-11 h-11 rounded-lg bg-slate-200" />
+                <div>
+                  <div className="h-4 w-32 rounded bg-slate-200 mb-1.5" />
+                  <div className="h-3 w-20 rounded bg-slate-200" />
                 </div>
               </div>
-
-              {/* Vote count & button placeholders */}
-              <div className="flex items-center gap-2 shrink-0">
-                <div className="h-8 w-16 sm:w-20 rounded-xl bg-slate-200 hidden xs:block" />
-                <div className="h-8 sm:h-9 w-20 sm:w-24 rounded-xl bg-slate-200" />
+              <div className="flex items-center gap-3">
+                <div className="h-4 w-14 rounded bg-slate-200" />
+                <div className="h-8 w-18 rounded-lg bg-slate-200" />
               </div>
             </div>
           ))}
@@ -93,29 +75,32 @@ export function TiktokerGrid({
     );
   }
 
+  // 2. Empty Search Results State
   if (tiktokers.length === 0) {
     return (
-      <section className="max-w-md mx-auto px-4 py-8 text-center">
-        <div className="p-6 rounded-3xl bg-white border border-slate-200 shadow-xs flex flex-col items-center">
-          <div className="w-12 h-12 rounded-2xl bg-blue-50 border border-blue-200 flex items-center justify-center text-blue-600 mb-2.5">
-            <SearchX className="w-6 h-6" />
+      <section className="max-w-md mx-auto px-4 py-12 text-center" aria-label="No results">
+        <div className="p-8 rounded-2xl bg-white border border-slate-200/90 flex flex-col items-center">
+          <div className="w-10 h-10 rounded-xl bg-slate-100 flex items-center justify-center text-slate-500 mb-3">
+            <SearchX className="w-5 h-5" />
           </div>
 
-          <h3 className="text-lg font-bold text-slate-900 mb-1">
+          <h3 className="text-base font-bold text-slate-900 mb-1">
             No Creators Found
           </h3>
 
-          <p className="text-xs text-slate-500 max-w-xs mb-4">
-            We couldn't find any creator matching your search. Try searching for another name or @handle.
+          <p className="text-xs text-slate-500 max-w-xs mb-5 leading-relaxed">
+            {isSearchActive
+              ? `We couldn't find any creator matching "${searchQuery}". Try searching for another name or @handle.`
+              : `No creators available at this time.`}
           </p>
 
-          {onResetSearch && (
+          {onResetSearch && isSearchActive && (
             <button
               type="button"
               onClick={onResetSearch}
-              className="px-4 py-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold transition-all active:scale-95 shadow-xs cursor-pointer"
+              className="px-4 py-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold transition-all active:scale-95 cursor-pointer focus:outline-none focus:ring-2 focus:ring-blue-500/30"
             >
-              Show All Nominees
+              Show All Creators
             </button>
           )}
         </div>
@@ -123,17 +108,74 @@ export function TiktokerGrid({
     );
   }
 
-  // Find current #1 leader if present in list
-  const leader = tiktokers.find((t) => (t.rank || 1) === 1);
-  const otherNominees = tiktokers.filter((t) => (t.rank || 1) !== 1);
+  // 3. Search Mode: Exactly 1 Match
+  if (isSearchActive && tiktokers.length === 1) {
+    const matchedCreator = tiktokers[0];
+    return (
+      <section id="creator-search-result" className="w-full max-w-4xl mx-auto px-4 sm:px-6 py-3 sm:py-5">
+        <LeaderCard
+          tiktoker={matchedCreator}
+          isSearchMode={true}
+          leadVotes={0}
+          userCooldownRemainingSeconds={userCooldownRemainingSeconds}
+          isCampaignClosed={isCampaignClosed}
+          onVoteClick={onVoteClick}
+        />
+      </section>
+    );
+  }
+
+  // 4. Search Mode: Multiple Matches (> 1 match)
+  if (isSearchActive && tiktokers.length > 1) {
+    return (
+      <section id="creator-search-results" className="w-full max-w-4xl mx-auto px-4 sm:px-6 py-3 sm:py-5">
+        <div className="bg-white border border-slate-200/90 rounded-2xl p-4 sm:p-5">
+          {/* Header */}
+          <div className="flex items-center justify-between pb-3 mb-1 border-b border-slate-200/70">
+            <h3 className="text-xs font-black tracking-widest text-slate-900 uppercase">
+              Search Results
+            </h3>
+
+            <span className="text-xs text-slate-500 font-medium">
+              {tiktokers.length} Creators found
+            </span>
+          </div>
+
+          {/* Results List with Original Ranks Preserved */}
+          <div role="list" aria-label="Search results list">
+            {tiktokers.map((tiktoker) => (
+              <TiktokerListItem
+                key={tiktoker.id}
+                tiktoker={tiktoker}
+                rank={tiktoker.rank || 1}
+                userCooldownRemainingSeconds={userCooldownRemainingSeconds}
+                isCampaignClosed={isCampaignClosed}
+                onVoteClick={onVoteClick}
+              />
+            ))}
+          </div>
+        </div>
+      </section>
+    );
+  }
+
+  // 5. Default State (No Search Active)
+  // Find genuine current #1 leader and #2 creator to calculate dynamic lead
+  const leader = tiktokers.find((t) => (t.rank || 1) === 1) || tiktokers[0];
+  const secondPlace = tiktokers.find((t) => (t.rank || 2) === 2) || (tiktokers.length > 1 ? tiktokers[1] : null);
+  const otherNominees = tiktokers.filter((t) => t.id !== leader?.id);
+
+  const leadVotes = leader && secondPlace ? Math.max(0, leader.vote_count - secondPlace.vote_count) : 0;
 
   return (
-    <section id="creator-leaderboard" className="w-full max-w-4xl mx-auto px-3 sm:px-4 py-2 sm:py-4 overflow-hidden">
-      {/* 1. Leader Spotlight Frame (#1 Rank) */}
+    <section id="creator-leaderboard" className="w-full max-w-4xl mx-auto px-4 sm:px-6 py-3 sm:py-5">
+      {/* 1. Real #1 Leader Hero Spotlight */}
       {leader && (
-        <div className="mb-4 sm:mb-6 w-full max-w-full">
+        <div className="mb-6 sm:mb-8 w-full max-w-full">
           <LeaderCard
             tiktoker={leader}
+            leadVotes={leadVotes}
+            isSearchMode={false}
             userCooldownRemainingSeconds={userCooldownRemainingSeconds}
             isCampaignClosed={isCampaignClosed}
             onVoteClick={onVoteClick}
@@ -141,21 +183,22 @@ export function TiktokerGrid({
         </div>
       )}
 
-      {/* 2. Nominees Item List (#2 to #10) */}
+      {/* 2. Nominees Leaderboard Ranking List (#2 to #11) */}
       {otherNominees.length > 0 && (
-        <div className="space-y-2.5 sm:space-y-3">
-          <div className="flex items-center justify-between px-1 mb-1">
-            <div className="flex items-center gap-1.5 text-slate-900 font-extrabold text-sm sm:text-base">
-              <ListOrdered className="w-4 h-4 text-blue-600" />
-              <span>Leaderboard Nominees</span>
-            </div>
+        <div className="bg-white border border-slate-200/90 rounded-2xl p-4 sm:p-5">
+          {/* Section Header */}
+          <div className="flex items-center justify-between pb-3 mb-1 border-b border-slate-200/70">
+            <h3 className="text-xs font-black tracking-widest text-slate-900 uppercase">
+              Leaderboard
+            </h3>
 
-            <span className="text-[11px] text-slate-500 font-medium">
-              Ranks #2 – #{otherNominees[otherNominees.length - 1]?.rank || 10}
+            <span className="text-xs text-slate-400 font-medium">
+              Ranks #2 – #{tiktokers[tiktokers.length - 1]?.rank || tiktokers.length}
             </span>
           </div>
 
-          <div className="flex flex-col gap-2 sm:gap-2.5">
+          {/* Clean Ranking List */}
+          <div role="list" aria-label="Nominees leaderboard">
             {otherNominees.map((tiktoker) => (
               <TiktokerListItem
                 key={tiktoker.id}

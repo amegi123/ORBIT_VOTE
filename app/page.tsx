@@ -12,6 +12,7 @@ import { VoteModal } from '@/components/VoteModal';
 import { StatusCheckModal } from '@/components/StatusCheckModal';
 import { RulesModal } from '@/components/RulesModal';
 import { Footer } from '@/components/Footer';
+import { FloatingDemoReset } from '@/components/FloatingDemoReset';
 
 export default function Home() {
   const { showToast } = useToast();
@@ -173,8 +174,8 @@ export default function Home() {
 
     showToast({
       type: 'info',
-      title: 'Demo Reset Activated',
-      message: 'This feature is only for demo',
+      title: 'Demo Reset Activated ⚠️',
+      message: 'Note: This reset button is only available in development for testing. In production, this button is removed.',
     });
   };
 
@@ -186,7 +187,6 @@ export default function Home() {
       <Navbar
         onOpenRules={() => setIsRulesModalOpen(true)}
         onOpenStatusCheck={() => setIsStatusCheckModalOpen(true)}
-        onDemoReset={handleDemoReset}
       />
 
       {/* 2. Personal 24-Hour Cooldown Banner (if active) */}
@@ -211,6 +211,7 @@ export default function Home() {
       {/* 4. Creator Voting Cards */}
       <TiktokerGrid
         tiktokers={filteredTiktokers}
+        searchQuery={searchQuery}
         isLoading={isLoading}
         totalVotesAllCreators={totalVotes}
         userCooldownRemainingSeconds={cooldownSecondsRemaining}
@@ -224,6 +225,9 @@ export default function Home() {
         onOpenRules={() => setIsRulesModalOpen(true)}
         onOpenStatusCheck={() => setIsStatusCheckModalOpen(true)}
       />
+
+      {/* 6. Floating Demo Reset Button (Only for demo testing) */}
+      <FloatingDemoReset onReset={handleDemoReset} />
 
       {/* 7. Voting Modal (Phone + OTP + Success) */}
       <VoteModal
