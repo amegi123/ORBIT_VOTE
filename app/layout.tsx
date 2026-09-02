@@ -3,13 +3,31 @@ import "./globals.css";
 import { ToastProvider } from "@/components/ToastContext";
 
 export const metadata: Metadata = {
-  title: "Orbit Creative Challenge 2026 | Official Voting Platform",
-  description: "Official Orbit Electronics Creative Challenge 2026. Cast your verified vote once every 24 hours.",
-  keywords: ["Orbit Electronics", "Orbit Creative Challenge", "Ethiopian Creators", "Creative Challenge Vote", "Orbit Voting"],
+  metadataBase: new URL("https://orbitvote.vercel.app"),
+  title: "Orbit Creative Challenge Vote | Orbit Electronics",
+  description: "Official Orbit Electronics Creative Challenge 2026. Cast your verified vote once every 24 hours and help your favorite creator win.",
+  keywords: ["Orbit Electronics", "Orbit Creative Challenge", "Orbit Creative Challenge Vote", "Ethiopian Creators", "Creative Challenge Vote", "Orbit Voting"],
   openGraph: {
-    title: "Orbit Creative Challenge 2026",
-    description: "Help your favorite creator win the Orbit Creative Challenge 2026. Verified 24-hour voting platform.",
+    title: "Orbit Creative Challenge Vote",
+    description: "Official Orbit Electronics Creative Challenge 2026. Cast your verified vote once every 24 hours.",
+    url: "https://orbitvote.vercel.app",
+    siteName: "Orbit Creative Challenge Vote",
+    images: [
+      {
+        url: "/orbit-electronics-logo.png",
+        width: 800,
+        height: 400,
+        alt: "Orbit Creative Challenge Vote",
+      },
+    ],
+    locale: "en_US",
     type: "website",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Orbit Creative Challenge Vote",
+    description: "Official Orbit Electronics Creative Challenge 2026. Cast your verified vote once every 24 hours.",
+    images: ["/orbit-electronics-logo.png"],
   },
 };
 
